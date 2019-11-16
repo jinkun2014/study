@@ -1,6 +1,7 @@
-# 学习笔记
+![img](http://p9.pstatp.com/large/pgc-image/c4c62c2c78ac4c88bc218a3bd1129c20)
 
-> 所有资源均来自网络。
+
+图片来自 Pexels
 
 内容主要如下：
 
@@ -28,6 +29,7 @@ GC 调优中，GC 导致的应用暂停时间影响系统响应速度，GC 处�
 
 
 
+![img](http://p3.pstatp.com/large/pgc-image/4c6b9b264edb4583acdffbc919ce4e6a)
 
 
 **新生代(Young Generation)**
@@ -83,8 +85,10 @@ GC 日志是一个很重要的工具，它准确记录了每一次的 GC 的执�
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/3279fcf94cd3486ca57996e6a1459a1f)
 
 
+![img](http://p9.pstatp.com/large/pgc-image/f4815a04b2264167adfb8f464c46811e)
 
 
 免费的 GC 日志图形分析工具推荐下面 2 个：
@@ -111,6 +115,7 @@ continueSize，老年代最大可用连续空间：
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/f20cf30751104cfab87cff86e190fee1)
 
 
 Young GC 之后如果成功(Young GC 后晋升对象能放入老年代)，则代表担保成功，不用再进行 Full GC，提高性能。
@@ -158,12 +163,14 @@ CMS 收集器工作时，尽可能让 GC 线程和用户线程并发执行，以
 
 
 
+![img](http://p9.pstatp.com/large/pgc-image/03f7c03c97e84cccb2d4fd1b3be9d586)
 
 
 **老年代垃圾回收**
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/1cbc492303fe415dafb3b2311925c77f)
 
 
 CMS GC 以获取最小停顿时间为目的，尽可能减少 STW 时间，可以分为 7 个阶段：
@@ -172,6 +179,7 @@ CMS GC 以获取最小停顿时间为目的，尽可能减少 STW 时间，可�
 
 
 
+![img](http://p3.pstatp.com/large/pgc-image/ad6eead18eb8466197dac7cdb16b80da)
 
 
 此阶段的目标是标记老年代中所有存活的对象, 包括 GC Root 的直接引用, 以及由新生代中存活对象所引用的对象，触发第一次 STW 事件。
@@ -182,6 +190,7 @@ CMS GC 以获取最小停顿时间为目的，尽可能减少 STW 时间，可�
 
 
 
+![img](http://p9.pstatp.com/large/pgc-image/ededb27e2a274cea8f99842aff3cdfec)
 
 
 此阶段 GC 线程和应用线程并发执行，遍历阶段 1 初始标记出来的存活对象，然后继续递归标记这些对象可达的对象。
@@ -190,6 +199,7 @@ CMS GC 以获取最小停顿时间为目的，尽可能减少 STW 时间，可�
 
 
 
+![img](http://p3.pstatp.com/large/pgc-image/3cf6db746cec4722a5e25974a9e86ce5)
 
 
 此阶段 GC 线程和应用线程也是并发执行，因为阶段 2 是与应用线程并发执行，可能有些引用关系已经发生改变。
@@ -220,6 +230,7 @@ CMS GC 以获取最小停顿时间为目的，尽可能减少 STW 时间，可�
 
 
 
+![img](http://p9.pstatp.com/large/pgc-image/27608106d1884db88ac0b375cf168bf1)
 
 
 此阶段与应用程序并发执行，不需要 STW 停顿，根据标记结果清除垃圾对象。
@@ -244,12 +255,14 @@ CMS 的 GC 停顿时间约 80% 都在最终标记阶段(Final Remark)，若该�
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/edb4582a18ac44a090e4fe878393396c)
 
 
 并发模式失败：当 CMS 在执行回收时，新生代发生垃圾回收，同时老年代又没有足够的空间容纳晋升的对象时，CMS 垃圾回收就会退化成单线程的 Full GC。所有的应用线程都会被暂停，老年代中所有的无效对象都被回收。
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/930cc9a29deb4007b9810dfb5f29d914)
 
 
 晋升失败：当新生代发生垃圾回收，老年代有足够的空间可以容纳晋升的对象，但是由于空闲空间的碎片化，导致晋升失败，此时会触发单线程且带压缩动作的 Full GC。
@@ -285,6 +298,7 @@ G1 最主要的设计目标是：实现可预期及可配置的 STW 停顿时间
 
 
 
+![img](http://p3.pstatp.com/large/pgc-image/854daa2c530649c39ba64c461f30d180)
 
 
 **①Region**
@@ -321,6 +335,7 @@ Mixed GC：当老年代空间达到阈值会触发 Mixed GC，选定所有新生
 
 
 
+![img](http://p3.pstatp.com/large/pgc-image/616bd1e4030744eaac0f18619db8f22b)
 
 
 全局并发标记主要是为 Mixed GC 计算找出回收收益较高的 Region 区域，具体分为 5 个阶段：
@@ -415,6 +430,7 @@ jstat -gc <pid> <统计间隔时间> <统计次数>
 
 
 
+![img](http://p1.pstatp.com/large/pgc-image/7b5dbf9dfcaa41b0b956761ce84d8db5)
 
 
 例如：jstat -gc 32683 1000 10，统计 pid=32683 的进程，每秒统计 1 次，统计 10 次。
@@ -482,7 +498,3 @@ https://github.com/caison/caison-blog-demo
 - GC 参考手册-Java 版 
 - 请教 G1 算法的原理——RednaxelaFX 的回答 
 - Java Hotspot G1 GC 的一些关键技术——美团技术团队
-
-
-
-
