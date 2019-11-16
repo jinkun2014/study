@@ -3,6 +3,9 @@
 - **JVM**
     - [GC原理及调优](/jvm/GC原理及调优.md)
 
+- **MQ**
+    - [Kafka原理](/jvm/Kafka原理.md)
+
 - **其它**
     - [Markdown](/others/markdown.md)
     - [Docsify](https://docsify.js.org/#/zh-cn/)
