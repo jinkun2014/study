@@ -519,3 +519,6 @@ https://github.com/caison/caison-blog-demo
 - 请教 G1 算法的原理——RednaxelaFX 的回答 
 - Java Hotspot G1 GC 的一些关键技术——美团技术团队
 
+** 来源地址 **
+
+[老大难的GC原理及调优，这全说清楚了](https://www.toutiao.com/a6740803737603801604/?tt_from=weixin&utm_campaign=client_share&wxshare_count=1&timestamp=1573131368&app=news_article&utm_source=weixin&utm_medium=toutiao_android&req_id=201911072056080100140481391D1C3E51&group_id=6740803737603801604)
