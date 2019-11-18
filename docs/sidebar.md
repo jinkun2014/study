@@ -3,8 +3,11 @@
 - **JVM**
     - [GC原理及调优](/jvm/GC原理及调优.md)
 
+- **SpringCloud**
+    - [SpringCloud整体架构概览](/spring-cloud/SpringCloud整体架构概览.md)
+
 - **MQ**
-    - [Kafka原理](/jvm/Kafka原理.md)
+    - [Kafka原理](/mq/Kafka原理.md)
 
 - **其它**
     - [Markdown](/others/markdown.md)
