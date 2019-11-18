@@ -70,8 +70,8 @@ public class JueJin {
             markdown = markdown.replace(key, imgMap.get(key));
         }
 
-        markdown += "" +
-                "## 声明" + "\n\n "
+        markdown = markdown
+                + "## 声明" + "\n\n"
                 + "原文地址: " + "[" + title + "](" + url + ")";
 
         // 保存md文件
