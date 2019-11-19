@@ -18,6 +18,8 @@
 
 回到正题，如果没有小芳便利店，那快递小哥和我的交互图就应该如下：
 
+  
+
 ![图-1](./Kafka原理/1.png)
 
 会出现什么情况呢？
@@ -31,6 +33,8 @@
   4、这个女朋友我不要了（绝对不可能）！
 
 小芳便利店出现后，交互图就应如下：
+
+  
 
 ![图-2](./Kafka原理/2.png)
 
@@ -58,11 +62,15 @@
 
 **一、 点对点模式**
 
+  
+
 ![图-3](./Kafka原理/3.png)
 
 如上图所示，点对点模式通常是基于拉取或者轮询的消息传送模型，这个模型的特点是发送到队列的消息被一个且只有一个消费者进行处理。生产者将消息放入消息队列后，由消费者主动的去拉取消息进行消费。点对点模型的的优点是消费者拉取消息的频率可以由自己控制。但是消息队列是否有消息需要消费，在消费者端无法感知，所以在消费者端需要额外的线程去监控。
 
 **二、 发布订阅模式**
+
+  
 
 ![图-4](./Kafka原理/4.png)
 
@@ -104,9 +112,13 @@
 
 我们看上面的架构图中，producer就是生产者，是数据的入口。注意看图中的红色箭头，Producer在写入数据的时候**永远的找leader**，不会直接将数据写入follower！那leader怎么找呢？写入的流程又是什么样的呢？我们看下图：
 
+  
+
 ![图-6](./Kafka原理/6.png)
 
 发送的流程就在图中已经说明了，就不单独在文字列出来了！需要注意的一点是，消息写入leader后，follower是主动的去leader进行同步的！producer采用push模式将数据发布到broker，每条消息追加到分区中，顺序写入磁盘，所以保证**同一分区**内的数据是有序的！写入示意图如下：
+
+  
 
 ![图-7](./Kafka原理/7.png)
 
@@ -140,6 +152,8 @@ Producer将数据写入kafka后，集群就需要对数据进行保存了！kafk
 
 前面说过了每个topic都可以分为一个或多个partition，如果你觉得topic比较抽象，那partition就是比较具体的东西了！Partition在服务器上的表现形式就是一个一个的文件夹，每个partition的文件夹下面会有多组segment文件，每组segment文件又包含.index文件、.log文件、.timeindex文件（早期版本中没有）三个文件， log文件就实际是存储message的地方，而index和timeindex文件为索引文件，用于检索消息。
 
+  
+
 ![图-8](./Kafka原理/8.png)
 
 如上图，这个partition有三组segment文件，每个log文件的大小是一样的，但是存储的message数量是不一定相等的（每条的message大小不一致）。文件的命名是以该segment最小offset来命名的，如000.index存储offset为0\~368795的消息，kafka就是利用分段+索引的方式来解决查找效率的问题。
@@ -170,6 +184,8 @@ Producer将数据写入kafka后，集群就需要对数据进行保存了！kafk
 
 多个消费者可以组成一个消费者组（consumer group），每个消费者组都有一个组id！同一个消费组者的消费者可以消费同一topic下不同分区的数据，但是不会组内多个消费者消费同一分区的数据！！！是不是有点绕。我们看下图：
 
+  
+
 ![图-9](./Kafka原理/9.png)
 
 图示是消费者组内的消费者小于partition数量的情况，所以会出现某个消费者消费多个partition数据的情况，消费的速度也就不及只处理一个partition的消费者的处理速度！如果是消费者组的消费者多于partition的数量，那会不会出现多个消费者消费同一个partition的数据呢？
@@ -196,4 +212,4 @@ Producer将数据写入kafka后，集群就需要对数据进行保存了！kafk
 >
 ## 声明
 
- 原文地址: [曾经我以为我很懂Kafka，直到我看了这篇文章](https://www.toutiao.com/a6758731417548489229/?tt_from=weixin&utm_campaign=client_share&wxshare_count=1&timestamp=1573693037&app=news_article&utm_source=weixin&utm_medium=toutiao_android&req_id=2019111408571701001005322202E28F8F&group_id=6758731417548489229)
+原文地址: [曾经我以为我很懂Kafka，直到我看了这篇文章](https://www.toutiao.com/a6758731417548489229/?tt_from=weixin&utm_campaign=client_share&wxshare_count=1&timestamp=1573693037&app=news_article&utm_source=weixin&utm_medium=toutiao_android&req_id=2019111408571701001005322202E28F8F&group_id=6758731417548489229)

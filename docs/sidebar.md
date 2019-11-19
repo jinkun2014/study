@@ -1,6 +1,7 @@
 - [首页](/)
 
 - **JVM**
+    - [Java虚拟机垃圾回收](/jvm/Java虚拟机垃圾回收.md)
     - [GC原理及调优](/jvm/GC原理及调优.md)
 
 - **SpringCloud**

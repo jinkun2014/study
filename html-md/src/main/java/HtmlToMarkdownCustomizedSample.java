@@ -121,7 +121,7 @@ public class HtmlToMarkdownCustomizedSample {
         }
 
         private void processP(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
-            if (!StringUtils.isBlank(node.text())) {
+            if (!StringUtils.isBlank(node.text()) || node.childNodeSize()>0) {
                 context.renderChildren(node, false, null);
                 out.blankLine();
             }

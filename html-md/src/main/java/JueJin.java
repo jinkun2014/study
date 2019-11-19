@@ -26,9 +26,16 @@ public class JueJin {
     // 生成目录
     static String path = "E:\\我的学习\\study\\docs\\jvm";
     // 文章标题
-    static String fileName = "GC原理及调优";
+    static String fileName = "Java虚拟机垃圾回收";
     // 文章地址
-    static String url = "https://juejin.im/post/5b6b986c6fb9a04fd1603f4a";
+    static String url = "https://juejin.im/post/5aed3f2bf265da0b886d4d31";
+
+    // // 生成目录
+    // static String path = "E:\\我的学习\\study\\docs\\jvm";
+    // // 文章标题
+    // static String fileName = "GC原理及调优";
+    // // 文章地址
+    // static String url = "https://juejin.im/post/5b6b986c6fb9a04fd1603f4a";
 
     // // 生成目录
     // static String path = "E:\\我的学习\\study\\docs\\spring-cloud";
