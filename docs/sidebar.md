@@ -1,5 +1,8 @@
 - [首页](/)
 
+- **Java**
+    - [HashMap和ConcurrentHashMap源码分析](/java/HashMap和ConcurrentHashMap源码分析.md)
+
 - **JVM**
     - [Java虚拟机垃圾回收](/jvm/Java虚拟机垃圾回收.md)
     - [GC原理及调优](/jvm/GC原理及调优.md)
@@ -11,6 +14,7 @@
     - [Kafka原理](/mq/Kafka原理.md)
 
 - **其它**
+    - [test](/others/test.md)
     - [Markdown](/others/markdown.md)
     - [Docsify](https://docsify.js.org/#/zh-cn/)
     - [Docsify-themeable](https://jhildenbiddle.github.io/docsify-themeable/)

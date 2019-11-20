@@ -1,12 +1,19 @@
 import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.html2md.converter.*;
+import com.vladsch.flexmark.html2md.converter.internal.HtmlConverterCoreNodeRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.Utils;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import com.vladsch.flexmark.util.html.LineFormattingAppendable;
+import com.vladsch.flexmark.util.sequence.BasedSequence;
+import com.vladsch.flexmark.util.sequence.BasedSequenceImpl;
+import com.vladsch.flexmark.util.sequence.RepeatedCharSequence;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,9 +34,9 @@ public class HtmlToMarkdownCustomizedSample {
         @Override
         public ResolvedLink resolveLink(Node node, HtmlNodeConverterContext context, ResolvedLink link) {
             // convert all links from http:// to https://
-            if (link.getUrl().startsWith("http:")) {
-                return link.withUrl("https:" + link.getUrl().substring("http:".length()));
-            }
+            // if (link.getUrl().startsWith("http:")) {
+            //     return link.withUrl("https:" + link.getUrl().substring("http:".length()));
+            // }
             return link;
         }
 
@@ -84,9 +91,10 @@ public class HtmlToMarkdownCustomizedSample {
         public Set<HtmlNodeRendererHandler<?>> getHtmlNodeRendererHandlers() {
             Set<HtmlNodeRendererHandler<?>> set = new HashSet<>();
             set.add(new HtmlNodeRendererHandler<>("kbd", Element.class, this::processKbd));
+            set.add(new HtmlNodeRendererHandler<>("blockquote", Element.class, this::processBlockQuote));
             set.add(new HtmlNodeRendererHandler<>("pre", Element.class, this::processPre));
             set.add(new HtmlNodeRendererHandler<>("img", Element.class, this::processImg));
-            set.add(new HtmlNodeRendererHandler<>("p", Element.class, this::processP));
+            // set.add(new HtmlNodeRendererHandler<>("p", Element.class, this::processP));
             set.add(new HtmlNodeRendererHandler<>("br", Element.class, this::processBr));
             set.add(new HtmlNodeRendererHandler<>("h1", Element.class, this::processH1));
             set.add(new HtmlNodeRendererHandler<>("h2", Element.class, this::processH2));
@@ -101,13 +109,98 @@ public class HtmlToMarkdownCustomizedSample {
             out.append("喝哈");
         }
 
+        private void processBlockQuote(Element element, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            if (HtmlConverterCoreNodeRenderer.isFirstChild(element)) {
+                out.line();
+            }
+            out.pushPrefix();
+            out.addPrefix("> ");
+            context.renderChildren(element, true, null);
+            out.line();
+            out.popPrefix();
+        }
+
+        /**
+         * 参考 HtmlConverterCoreNodeRenderer#processPre
+         *
+         * @param node
+         * @param context
+         * @param out
+         */
         private void processPre(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
-            out.append("```\n");
-            Element code = node.getElementsByTag("code").first();
-            out.append(code.attr("lang"));
-            out.append(code.ownText());
-            out.append("\n```");
-            out.blankLine();
+            // out.append("```\n");
+            // Element code = node.getElementsByTag("code").first();
+            // out.append(code.attr("lang"));
+            // out.append(code.ownText());
+            // out.append("\n```");
+            // out.blankLine();
+
+
+            context.pushState(node);
+
+            String text;
+            boolean hadCode = false;
+            String className = "";
+
+            HtmlNodeConverterContext preText = context.getSubContext();
+            preText.getMarkdown().setOptions(out.getOptions() & ~(LineFormattingAppendable.COLLAPSE_WHITESPACE | LineFormattingAppendable.SUPPRESS_TRAILING_WHITESPACE));
+            preText.getMarkdown().openPreFormatted(false);
+
+            Node next;
+            while ((next = context.next()) != null) {
+                if (next.nodeName().equalsIgnoreCase("code") || next.nodeName().equalsIgnoreCase("tt")) {
+                    hadCode = true;
+                    Element code = (Element) next;
+                    //text = code.toString();
+                    preText.renderChildren(code, false, null);
+                    // class="language-java hljs" -> java
+                    if (className.isEmpty())
+                        className = Utils.removeStart(code.className().replaceAll("hljs", "").replaceAll("copyable", ""), "language-");
+                } else if (next.nodeName().equalsIgnoreCase("br")) {
+                    preText.getMarkdown().append("\n");
+                } else if (next.nodeName().equalsIgnoreCase("#text")) {
+                    preText.getMarkdown().append(((TextNode) next).getWholeText());
+                } else {
+                    preText.renderChildren(next, false, null);
+                }
+            }
+
+            preText.getMarkdown().closePreFormatted();
+            text = preText.getMarkdown().toString(2);
+
+            //int start = text.indexOf('>');
+            //int end = text.lastIndexOf('<');
+            //text = text.substring(start + 1, end);
+            //text = Escaping.unescapeHtml(text);
+
+            int backTickCount = HtmlConverterCoreNodeRenderer.getMaxRepeatedChars(text, '`', 3);
+            CharSequence backTicks = RepeatedCharSequence.of("`", backTickCount);
+
+            if (!false && (!className.isEmpty() || text.trim().isEmpty() || !hadCode)) {
+                out.blankLine().append(backTicks);
+                if (!className.isEmpty()) {
+                    out.append(className).append("\t");
+                }
+                out.line();
+                out.openPreFormatted(true);
+                out.append(text.isEmpty() ? "\n" : text.replaceAll("复制代码\n", ""));
+                out.closePreFormatted();
+                out.line().append(backTicks).line();
+                out.tailBlankLine();
+            } else {
+                // we indent the whole thing by 4 spaces
+                out.blankLine();
+                out.pushPrefix();
+                out.addPrefix("    ");
+                out.openPreFormatted(true);
+                out.append(text.isEmpty() ? "\n" : text);
+                out.closePreFormatted();
+                out.line();
+                out.tailBlankLine();
+                out.popPrefix();
+            }
+
+            context.popState(out);
         }
 
         private void processImg(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
@@ -121,10 +214,31 @@ public class HtmlToMarkdownCustomizedSample {
         }
 
         private void processP(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
-            if (!StringUtils.isBlank(node.text()) || node.childNodeSize()>0) {
-                context.renderChildren(node, false, null);
-                out.blankLine();
-            }
+            // boolean isItemParagraph = false;
+            // boolean isDefinitionItemParagraph = false;
+            //
+            // Element firstElementSibling = node.firstElementSibling();
+            // if (firstElementSibling == null || node == firstElementSibling) {
+            //     String tagName = node.parent().tagName();
+            //     isItemParagraph = tagName.equalsIgnoreCase("li");
+            //     isDefinitionItemParagraph = tagName.equalsIgnoreCase("dd");
+            // }
+            //
+            // out.blankLineIf(!(isItemParagraph || isDefinitionItemParagraph || isFirstChild(element)));
+            //
+            // if (node.childNodeSize() == 0) {
+            //     if (myHtmlConverterOptions.brAsExtraBlankLines) {
+            //         out.append("<br />").blankLine();
+            //     }
+            // } else {
+            //     context.processTextNodes(node, false);
+            // }
+            //
+            // out.line();
+            //
+            // if (isItemParagraph || isDefinitionItemParagraph) {
+            //     out.tailBlankLine();
+            // }
         }
 
         private void processBr(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
@@ -132,25 +246,29 @@ public class HtmlToMarkdownCustomizedSample {
         }
 
         private void processH1(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            out.blankLine();
             out.append("## ");
             out.append(node.text());
             out.blankLine();
         }
 
         private void processH2(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            out.blankLine();
             out.append("### ");
             out.append(node.text());
             out.blankLine();
         }
 
         private void processH3(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
+            out.blankLine();
             out.append("#### ");
             out.append(node.text());
             out.blankLine();
         }
 
         private void processH4(Element node, HtmlNodeConverterContext context, HtmlMarkdownWriter out) {
-            out.append("##### ");
+            out.blankLine();
+            out.append("#### ");
             out.append(node.text());
             out.blankLine();
         }
@@ -165,6 +283,7 @@ public class HtmlToMarkdownCustomizedSample {
 
     public static void main(String[] args) {
         MutableDataSet options = new MutableDataSet()
+                .set(FlexmarkHtmlConverter.BR_AS_EXTRA_BLANK_LINES, false)
                 .set(Parser.EXTENSIONS, Collections.singletonList(HtmlConverterTextExtension.create()));
 
         String html = "" +
@@ -176,11 +295,11 @@ public class HtmlToMarkdownCustomizedSample {
                 " <figcaption></figcaption>\n" +
                 "</figure>" +
                 "<br/>" +
-                "<pre>\n" +
-                " <code class=\"hljs bash copyable\" lang=\"bash\">\n" +
-                "    -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps  -XX:+PrintGCTimeStamps\n" +
-                "    <span class=\"copy-code-btn\">复制代码</span>\n" +
-                " </code>\n" +
+                "<pre>" +
+                " <code class=\"hljs bash copyable\" lang=\"bash\">" +
+                "    -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps  -XX:+PrintGCTimeStamps" +
+                "    <span class=\"copy-code-btn\">复制代码</span>" +
+                " </code>" +
                 "</pre>" +
                 "<ul>\n" +
                 "  <li>\n" +
@@ -213,6 +332,8 @@ public class HtmlToMarkdownCustomizedSample {
         }
 
         saveStrAsFile("E:\\我的学习\\study\\docs\\others", "test.md", markdown);
+
+        System.out.println("hello\tworld");
     }
 
     /**

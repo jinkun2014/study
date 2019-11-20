@@ -1,3 +1,4 @@
+# GC原理及调优
 ## 概述
 
 本文介绍GC基础原理和理论，GC调优方法思路和方法，基于Hotspot jdk1.8，学习之后将了解如何对生产系统出现的GC问题进行排查解决
@@ -57,8 +58,8 @@ Young GC 每次都会引起全线停顿(Stop-The-World)，暂停所有的应用�
 
 GC日志是一个很重要的工具，它准确记录了每一次的GC的执行时间和执行结果，通过分析GC日志可以调优堆设置和GC设置，或者改进应用程序的对象分配模式，开启的JVM启动参数如下：
 
-```
-bash-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps
+``` bash
+-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps  -XX:+PrintGCTimeStamps
 ```
 
 常见的Young GC、Full GC日志含义如下：
@@ -110,8 +111,8 @@ CMS(Concurrent Mark and Sweep 并发-标记-清除)，是一款基于并发、�
 
 通过以下命令行参数，启用CMS垃圾收集器:
 
-```
-bash-XX:+UseConcMarkSweepGC
+``` bash
+-XX:+UseConcMarkSweepGC
 ```
 
 值得补充的是，下面介绍到的CMS GC是指老年代的GC，而Full GC指的是整个堆的GC事件，包括新生代、老年代、元空间等，两者有所区分
@@ -168,13 +169,13 @@ CMS GC以获取最小停顿时间为目的，尽可能减少STW时间，可以�
 
 ### 5 CMS常见问题
 
-##### 最终标记阶段停顿时间过长问题
+#### 最终标记阶段停顿时间过长问题
 
 CMS的GC停顿时间约80%都在最终标记阶段(Final Remark)，若该阶段停顿时间过长，常见原因是新生代对老年代的无效引用，在上一阶段的并发可取消预清理阶段中，执行阈值时间内未完成循环，来不及触发Young GC，清理这些无效引用
 
 通过添加参数：-XX:+CMSScavengeBeforeRemark。在执行最终操作之前先触发Young GC，从而减少新生代对老年代的无效引用，降低最终标记阶段的停顿，但如果在上个阶段(并发可取消的预清理)已触发Young GC，也会重复触发Young GC
 
-##### 并发模式失败(concurrent mode failure) & 晋升失败(promotion failed)问题
+#### 并发模式失败(concurrent mode failure) & 晋升失败(promotion failed)问题
 
 ![图-11](./GC原理及调优/11.png)
 
@@ -191,7 +192,7 @@ CMS的GC停顿时间约80%都在最终标记阶段(Final Remark)，若该阶段�
 * 增大老年代空间
 * 让对象尽量在新生代回收，避免进入老年代
 
-##### 内存碎片问题
+#### 内存碎片问题
 
 通常CMS的GC过程基于标记清除算法，不带压缩动作，导致越来越多的内存碎片需要压缩，常见以下场景会触发内存碎片压缩：
 
@@ -298,8 +299,8 @@ GC优化的核心思路在于：**尽可能让对象在新生代中分配和回�
 
 * **jstat** jvm自带命令行工具，可用于统计内存分配速率、GC次数，GC耗时，常用命令格式
 
-```
-bashjstat -gc <pid> <统计间隔时间> <统计次数>
+``` bash
+jstat -gc <pid> <统计间隔时间>  <统计次数>
 ```
 
 输出返回值代表含义如下：
@@ -310,10 +311,11 @@ bashjstat -gc <pid> <统计间隔时间> <统计次数>
 
 * **jmap** jvm自带命令行工具，可用于了解系统运行时的对象分布，常用命令格式如下
 
-```
-bash// 命令行输出类名、类数量数量，类占用内存大小，
+``` bash
+// 命令行输出类名、类数量数量，类占用内存大小，
 // 按照类占用内存大小降序排列
 jmap -histo <pid>
+
 // 生成堆内存转储快照，在当前目录下导出dump.hrpof的二进制文件，
 // 可以用eclipse的MAT图形化工具分析
 jmap -dump:live,format=b,file=dump.hprof <pid>
@@ -321,8 +323,8 @@ jmap -dump:live,format=b,file=dump.hprof <pid>
 
 * **jinfo** 命令格式
 
-```
-bashjinfo <pid>
+``` bash
+jinfo <pid> 
 ```
 
 用来查看正在运行的 Java 应用程序的扩展参数，包括Java System属性和JVM命令行参数
@@ -333,7 +335,7 @@ bashjinfo <pid>
 * jdk自动实时内存监控工具：VisualVM
 * 堆外内存监控： Java VisualVM安装Buffer Pools 插件、google perf工具、Java NMT(Native Memory Tracking)工具
 * GC日志分析：GCViewer、gceasy
-* GC参数检查和优化：[xxfox.perfma.com/](https://xxfox.perfma.com/)
+* GC参数检查和优化：[xxfox.perfma.com/](http://xxfox.perfma.com/)
 
 ### 2 GC优化案例
 
@@ -363,7 +365,7 @@ GC问题可以说没有捷径，排查线上的性能问题本身就并不简单
 
 《深入理解 Java 虚拟机：JVM 高级特性与最佳实践（第二版》 周志华
 
-[Java性能调优实战](https://gk.link/a/108k3)
+[Java性能调优实战](http://gk.link/a/108k3)
 
 [Getting Started with the G1 Garbage Collector](https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html)
 
@@ -377,4 +379,4 @@ GC问题可以说没有捷径，排查线上的性能问题本身就并不简单
 
 ## 声明
 
- 原文地址: [老大难的GC原理及调优，这下全说清楚了](https://juejin.im/post/5b6b986c6fb9a04fd1603f4a)
+原文地址: [老大难的GC原理及调优，这下全说清楚了](https://juejin.im/post/5b6b986c6fb9a04fd1603f4a)

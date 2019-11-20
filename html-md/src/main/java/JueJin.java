@@ -55,10 +55,15 @@ public class JueJin {
         String html = doc.body().getElementsByClass("article-content").first().html();
         System.out.println("html:" + html);
 
+        String markdown = ""
+                + "# " + fileName + "\n";
+
         // 解析Markdown
         MutableDataSet options = new MutableDataSet()
+                .set(FlexmarkHtmlConverter.BR_AS_EXTRA_BLANK_LINES, false)
                 .set(Parser.EXTENSIONS, Collections.singletonList(HtmlToMarkdownCustomizedSample.HtmlConverterTextExtension.create()));
-        String markdown = FlexmarkHtmlConverter.builder(options).build().convert(html);
+        markdown = markdown
+                + FlexmarkHtmlConverter.builder(options).build().convert(html);
         System.out.println("markdown:" + markdown);
 
         // 下载图片

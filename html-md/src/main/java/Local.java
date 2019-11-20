@@ -1,7 +1,6 @@
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -19,31 +18,27 @@ import java.util.regex.Pattern;
 /**
  * 抓取头条分享的文章转化为md文件
  */
-public class TouTiao {
+public class Local {
     // 生成目录
-    static String path = "E:\\我的学习\\study\\docs\\mq";
-
+    static String path = "E:\\我的学习\\study\\docs\\java";
     // 文章标题
-    static String fileName = "Kafka原理";
+    static String fileName = "HashMap和ConcurrentHashMap源码分析";
     // 文章地址
-    static String url = "https://www.toutiao.com/a6758731417548489229/?tt_from=weixin&utm_campaign=client_share&wxshare_count=1&timestamp=1573693037&app=news_article&utm_source=weixin&utm_medium=toutiao_android&req_id=2019111408571701001005322202E28F8F&group_id=6758731417548489229";
+    static String url = "https://javadoop.com/post/hashmap";
 
     static AtomicInteger imgCount = new AtomicInteger(1);
 
     public static void main(String[] args) throws IOException {
         // 下载文件
-        Document doc = Jsoup.connect(url).get();
-        String title = doc.title();
+        // Document doc = Jsoup.connect(url).get();
 
+        Document doc = Jsoup.parse(new File("E:\\我的学习\\study\\html-md\\src\\main\\resources\\demo.html"), "utf-8");
+
+        // String title = doc.body().getElementById("title").text();
+        String title = "Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析";
+        System.out.println("title:" + title);
         // Html内容
-        String html = "";
-        String regex = "content: \'(.*?)\'\\.slice";
-        Matcher matcher = Pattern.compile(regex).matcher(doc.body().html());
-        while (matcher.find()) {
-            String ret = matcher.group(1);
-            // 获取HTML
-            html = StringEscapeUtils.unescapeHtml4(unicodeDecode(ret)).replaceAll("\\\\\"", "").replaceAll("\"", "");
-        }
+        String html = doc.body().getElementById("content").html();
         System.out.println("html:" + html);
 
         String markdown = ""
@@ -59,8 +54,8 @@ public class TouTiao {
 
         // 下载图片
         Map<String, String> imgMap = new HashMap<>();
-        regex = "!\\[(.*)\\]\\((.*)\\)";
-        matcher = Pattern.compile(regex).matcher(markdown);
+        String regex = "!\\[(.*)\\]\\((.*)\\)";
+        Matcher matcher = Pattern.compile(regex).matcher(markdown);
         while (matcher.find()) {
             String imgSrc = matcher.group(2);
             System.out.println(imgSrc);
@@ -79,17 +74,6 @@ public class TouTiao {
 
         // 保存md文件
         saveStrAsFile(path, fileName + ".md", markdown);
-    }
-
-    public static String unicodeDecode(String string) {
-        Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
-        Matcher matcher = pattern.matcher(string);
-        char ch;
-        while (matcher.find()) {
-            ch = (char) Integer.parseInt(matcher.group(2), 16);
-            string = string.replace(matcher.group(1), ch + "");
-        }
-        return string;
     }
 
     /**
