@@ -1,6 +1,6 @@
 - [首页](/)
 
-- **Java**
+- Java
     - [HashMap和ConcurrentHashMap源码分析](/java/HashMap和ConcurrentHashMap源码分析.md)
 
 - **JVM**
