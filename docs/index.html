@@ -24,18 +24,20 @@
 		/* --base-font-size: 14px; */
 
 		/* Change the theme color hue (0-360) */
-		/* --theme-hue: 325; */
+		/* --theme-hue: 113;*/
 
 		/* Add sidebar navigation bullets */
 		/* --sidebar-nav-link-before-content-l1: '😀'; */
 		/* --sidebar-nav-link-before-content-l2: '💩'; */
+		/*--sidebar-nav-link-before-content: '😀';*/
 	}
 
 	img {
 		display: block;
 		margin: 10px auto;
 	}
-	.sidebar-nav p{
+
+	.sidebar-nav p {
 		margin-block-start: 0;
 		margin-block-end: 0;
 	}
@@ -72,7 +74,16 @@ window.$docsify = {
 		depth: 3,
 		noData: '没有结果!',
 		placeholder: '搜索...'
-	}
+	},
+	plugins: [
+		function (hook, vm) {
+			hook.beforeEach(function (html) {
+				return html
+					+ '\n\n\n\n'
+					+ '<a href="https://enenyun.com" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by docsify 2020</a> © 粤ICP备20027347号'
+			})
+		}
+	]
 }
 </script>
 
