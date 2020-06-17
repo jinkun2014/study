@@ -10,6 +10,10 @@
     - [Kafka原理](mq/Kafka原理.md)
 - 事务
     - [分布式事务基础篇](tx/分布式事务基础篇.md)
+- 数据库
+    - [Explain执行计划](sql/Explain执行计划.md)
+- 大数据
+    - [Flink 在快手实时多维分析场景的应用](flink/Flink在快手实时多维分析场景的应用.md)
 - 其它
     - [test](others/test.md)
     - [Markdown](others/markdown.md)

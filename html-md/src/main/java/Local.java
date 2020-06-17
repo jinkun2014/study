@@ -20,11 +20,11 @@ import java.util.regex.Pattern;
  */
 public class Local {
     // 生成目录
-    static String path = "E:\\我的学习\\study\\docs\\java";
+    static String path = "D:\\workspaces\\study\\docs\\flink";
     // 文章标题
-    static String fileName = "HashMap和ConcurrentHashMap源码分析";
+    static String fileName = "Flink在快手实时多维分析场景的应用";
     // 文章地址
-    static String url = "https://javadoop.com/post/hashmap";
+    static String url = "https://www.infoq.cn/article/Zkz1vpE3QGYfRUTb6PcM";
 
     static AtomicInteger imgCount = new AtomicInteger(1);
 
@@ -32,10 +32,10 @@ public class Local {
         // 下载文件
         // Document doc = Jsoup.connect(url).get();
 
-        Document doc = Jsoup.parse(new File("E:\\我的学习\\study\\html-md\\src\\main\\resources\\demo.html"), "utf-8");
+        Document doc = Jsoup.parse(new File("D:\\workspaces\\study\\html-md\\src\\main\\resources\\demo.html"), "utf-8");
 
         // String title = doc.body().getElementById("title").text();
-        String title = "Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析";
+        String title = "Flink在快手实时多维分析场景的应用";
         System.out.println("title:" + title);
         // Html内容
         String html = doc.body().getElementById("content").html();
