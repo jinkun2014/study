@@ -24,11 +24,11 @@ import java.util.regex.Pattern;
  */
 public class JueJin {
     // 生成目录
-    static String path = "D:\\workspaces\\study\\docs\\sql";
+    static String path = "D:\\workspaces\\study\\docs\\redis";
     // 文章标题
-    static String fileName = "Explain执行计划";
+    static String fileName = "基于Redis实现分布式锁之前,这些坑你一定得知道";
     // 文章地址
-    static String url = "https://juejin.im/post/5ec4e4a5e51d45786973b357";
+    static String url = "https://juejin.im/post/5e6727e16fb9a07cc845b9ba";
 
     // // 生成目录
     // static String path = "E:\\我的学习\\study\\docs\\jvm";
