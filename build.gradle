@@ -1,0 +1,61 @@
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java-library'
+
+    group 'me.jinkun'
+    version '1.0'
+    sourceCompatibility = '1.8'
+}
+
+buildscript {
+    ext {
+        springBootVersion = "2.3.4.RELEASE"
+        springCloudVersion = "Hoxton.SR8"
+        springCloudAlibabaVersion = "2.2.5.RELEASE"
+        mysqlVersion = '8.0.21'
+        guavaVersion = '28.2-jre'
+        hutoolVersion = '5.1.5'
+        mybatisplusVersion = '3.4.2'
+        seataVersion = '1.4.0'
+        feignOkhttpVersion = '10.8'
+        sentinelVersion = '1.7.1'
+        p6spyVersion = '3.8.7'
+        fastjsonVersion = '1.2.73'
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+subprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+        }
+    }
+    dependencies {
+        implementation 'org.projectlombok:lombok:1.18.6'
+        annotationProcessor 'org.projectlombok:lombok:1.18.6'
+
+        testImplementation 'junit:junit:4.12'
+        testImplementation('org.springframework.boot:spring-boot-starter-test') {
+            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+    }
+    test {
+        useJUnitPlatform()
+    }
+}
